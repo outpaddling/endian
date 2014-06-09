@@ -1,0 +1,194 @@
+.TH ENDIAN 1
+.SH NAME    \" Section header
+.PP
+
+endian \- Report endianness of a system.
+
+\" Convention:
+\" Underline anything that is typed verbatim - commands, etc.
+.SH SYNOPSIS
+.PP
+.nf 
+.na
+#!/bin/csh -f
+
+if ( `endian` == 'little' ) then
+    ...
+endif
+.ad
+.fi
+
+\" Optional sections
+.SH "SUMMARY"
+
+The
+.B endian
+command reports the endianness of memory on the computer running it.
+Note that different endianness may be employed for particular I/O
+operations, such as network packets, without regard for the endianness
+used in memory storage.
+
+.SH "BACKGROUND"
+
+Endianness is defined as the order in which the bytes of an integer
+value are stored or transmitted.  Binary integer values are regarded as
+a simple string of bits by the CPU.  For example, the 8-bit binary integer
+
+.nf
+.na
+10101101 
+
+= 1*2^7 + 0*2^6 + 1*2^5 + 0*2^4 + 1*2^3 + 1*2^2 + 0*2^1 + 1*2^0
+= 128 + 32 + 8 + 4 + 1
+= 173
+.ad
+.fi
+
+Most CPUs can process integer values of 8, 16, 32, or 64 bits at once, but
+each memory address holds only 8 bits (1 byte).  Hence, integers must span
+multiple memory addresses, and an order for the bytes must be chosen.
+
+Most computers are classified as either little-endian or big-endian.
+Little-endian
+machines store the least significant byte (i.e. the 8 bits representing the
+lowest powers of 2) at the lowest memory address, i.e. the "little end" first.
+For example, if we stored the 4 byte (long) integer value 1 on a little
+endian machine at address 1000, it would appear in memory as the following
+hexadecimal bytes:
+
+.nf
+.na
+    1000    | 01 |
+    1001    | 00 |
+    1002    | 00 |
+    1003    | 00 |
+.ad
+.fi
+
+Conversely, big-endian machines store the most significant byte (the "big end")
+first. Hence the same value above would be stored in memory as follows:
+
+.nf
+.na
+    1000    | 00 |
+    1001    | 00 |
+    1002    | 00 |
+    1003    | 01 |
+.ad
+.fi
+
+A few rare CPUs may used other schemes, where the bytes are not stored in
+order of significance.  For example, the least significant byte may be
+stored in position 2 or 3 of a 4 byte integer word.  These machines are
+referred to as
+.B mixed
+or
+.B middle
+endian.  For example:
+
+.na
+.nf
+    1000    | 00 |
+    1001    | 01 |
+    1002    | 00 |
+    1003    | 00 |
+.ad
+.fi
+
+Much effort has gone into determining what order is generally more
+efficient or useful, but given the wide range of ever-changing demands placed on
+computers, this is difficult to generalize, and as a result, both schemes
+have been widely adopted by computer architects.
+
+Programmers often make erroneous assumptions about endianness based on the
+operating system or the processor type.  For example, most Linux systems run on
+Intel processors, so it may be tempting to assume that Linux systems are
+little-endian.  However, many operating systems, especially open-source systems
+such as the BSDs and Linux, run on a wide variety of platforms with different
+endianness, so it is by no means safe to assume anything 
+based on the OS.  As an extreme example, NetBSD, as of January 2007,
+supports 17 different CPU types on 58 different system architectures.
+
+Furthermore, many CPUs, including popular ones such as the DEC
+Alpha, PowerPC, DEC MIPS, and some Sun Sparc processors, are capable of
+operating in either big or little-endian mode.  Hence, even checking the
+processor type will not reveal the correct endianness.
+
+The only sure way to discover the endianness is by storing an specially
+crafted integer value (e.g. 0x01020304) 
+at a particular memory address, and then checking the
+component bytes individually.  In a C program, this is easily accomplished
+using a union as follows:
+
+.nf
+.na
+union
+{
+    unsigned long   intval;
+    struct
+    {
+	unsigned char   byte0;
+	unsigned char   byte1;
+	unsigned char   byte2;
+	unsigned char   byte3;
+    };
+}
+.ad
+.fi
+
+or by using a character pointer to examine the
+bytes at an integer address:
+
+.nf
+.na
+unsigned long   intval;
+unsigned char   *p;
+
+p = (unsigned char *)&intval;
+.ad
+.fi
+
+Ideally, all programs should be written to use portable data formats,
+independent of endianness, so that end-users need not be concerned with
+the endianness of their hardware.  However, many existing 
+programs dump binary data
+from memory to files without any formatting, and in cases where this has
+been done, it is necessary to know the endianness of the machine the wrote
+the data, as well as any other that reads it.
+
+Compiled programs can use techniques like those above.  If checking from
+the command line or a shell script is necessary, the
+.B endian
+command will perform the check and provide the results in a usable format.
+
+.SH "DESCRIPTION"
+
+.B Endian
+reports the endianness to the standard output as "little", "big", or
+"mixed".  As there is no standard terminology for the various possible
+mixed modes, and very few such machines even exist,
+.B endian
+does not distinguish between various mixed modes.
+
+.SH "EXIT VALUES"
+
+.nf
+.na
+0 for little-endian
+1 for big-endian
+2 for mixed-endian
+.ad
+.fi
+
+.SH "FILES"
+sys/endian.h
+
+.SH AUTHOR
+.nf
+.na
+Jason W. Bacon
+
+.SH HISTORY
+The
+.B endian
+command was created in January, 2007, as a FreeBSD port.
