@@ -18,6 +18,7 @@ clean:
 	rm -f *.o endian *.nr *.gmon
 
 install: endian
-	install -c -m 0755 endian ${PREFIX}/bin
-	mkdir -p ${PREFIX}/man/man1
-	install -c -m 0644 endian.1 ${PREFIX}/man/man1
+	mkdir -p ${STAGEDIR}${PREFIX}/bin \
+		${STAGEDIR}${PREFIX}/man/man1
+	install -c -m 0755 endian ${STAGEDIR}${PREFIX}/bin
+	install -c -m 0644 endian.1 ${STAGEDIR}${PREFIX}/man/man1
