@@ -1,11 +1,11 @@
-OBJS	= endian.o
-CC	?= gcc
-CFLAGS	+= -Wall -O
-PREFIX	?= /usr/local
+OBJS    = endian.o
+CC      ?= gcc
+CFLAGS  ?= -Wall -O
+PREFIX  ?= /usr/local
 
-all:	endian
+all:    endian
 
-endian:	$(OBJS)
+endian: $(OBJS)
 	$(CC) -o endian $(OBJS) 
 
 endian.o: endian.c
