@@ -8,9 +8,11 @@ It is meant for use in scripts that need to determine endianness.
 Such script often make erroneous assumptions based on the operating system
 such as the following:
 
+```
 if [ $(uname -p) = powerpc ]; then
     endian=big
 fi
+```
 
 In fact, powerpc systems may be either big or little endian.
 
