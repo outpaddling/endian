@@ -1,12 +1,27 @@
+
+BIN     = endian
 OBJS    = endian.o
-CC      ?= gcc
+CC      ?= cc
 CFLAGS  ?= -Wall -O
-PREFIX  ?= /usr/local
 
-all:    endian
+# Install in ../local, unless defined by the parent Makefile, the
+# environment, or a command line option such as PREFIX=/opt/local.
+# FreeBSD ports sets this to /usr/local, MacPorts to /opt/local, etc.
+PREFIX      ?= ../local
 
-endian: $(OBJS)
-	$(CC) -o endian $(OBJS) 
+# Where to find local libraries and headers.  If you want to use libraries
+# from outside ${PREFIX} (not usually recommended), you can set this
+# independently.
+LOCALBASE   ?= ${PREFIX}
+
+# Allow caller to override either MANPREFIX or MANDIR
+MANPREFIX   ?= ${PREFIX}
+MANDIR      ?= ${MANPREFIX}/share/man
+
+all:    $(BIN)
+
+$(BIN): $(OBJS)
+	$(CC) -o $(BIN) $(OBJS) $(LDFLAGS)
 
 endian.o: endian.c
 	$(CC) -c $(CFLAGS) endian.c
@@ -15,10 +30,10 @@ reallyclean: clean
 	rm -f .*.bak *.bak
 
 clean:
-	rm -f *.o endian *.nr *.gmon
+	rm -f $(OBJS) $(BIN) *.nr *.gmon
 
-install: endian
-	mkdir -p ${STAGEDIR}${PREFIX}/bin \
-		${STAGEDIR}${PREFIX}/man/man1
-	install -c -m 0755 endian ${STAGEDIR}${PREFIX}/bin
-	install -c -m 0644 endian.1 ${STAGEDIR}${PREFIX}/man/man1
+install: $(BIN)
+	mkdir -p ${DESTDIR}${PREFIX}/bin \
+		${DESTDIR}${PREFIX}/man/man1
+	install -c -m 0755 $(BIN) ${DESTDIR}${PREFIX}/bin
+	install -c -m 0644 endian.1 ${DESTDIR}${MANDIR}/man1
