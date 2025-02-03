@@ -18,22 +18,22 @@ LOCALBASE   ?= ${PREFIX}
 MANPREFIX   ?= ${PREFIX}
 MANDIR      ?= ${MANPREFIX}/share/man
 
-all:    $(BIN)
+all:    ${BIN}
 
-$(BIN): $(OBJS)
-	$(CC) -o $(BIN) $(OBJS) $(LDFLAGS)
+${BIN}: ${OBJS}
+	${CC} -o ${BIN} ${OBJS} ${LDFLAGS}
 
 endian.o: endian.c
-	$(CC) -c $(CFLAGS) endian.c
+	${CC} -c ${CFLAGS} endian.c
 
 reallyclean: clean
 	rm -f .*.bak *.bak
 
 clean:
-	rm -f $(OBJS) $(BIN) *.nr *.gmon
+	rm -f ${OBJS} ${BIN} *.nr *.gmon
 
-install: $(BIN)
+install: ${BIN}
 	mkdir -p ${DESTDIR}${PREFIX}/bin \
-		${DESTDIR}${PREFIX}/man/man1
-	install -c -m 0755 $(BIN) ${DESTDIR}${PREFIX}/bin
+		${DESTDIR}${MANDIR}/man1
+	install -c -m 0755 ${BIN} ${DESTDIR}${PREFIX}/bin
 	install -c -m 0644 endian.1 ${DESTDIR}${MANDIR}/man1
